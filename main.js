@@ -1,57 +1,66 @@
-import { CONFIG } from "./config.js";
-import { vertexShader, fragmentShader } from "./shader.js";
+import * as THREE from 'https://unpkg.com/three@0.150.1/build/three.module.js';
+import { vertexShader, fragmentShader } from './shader.js';
+import { CONFIG } from './config.js';
 
-const canvas = document.getElementById("grain");
+let scene, camera, renderer, mesh, material;
 
-const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+function init() {
+  scene = new THREE.Scene();
+  
+  // RWD 相機設定
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+  camera.position.z = 2;
 
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio); // 防止高解析度螢幕模糊
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-// ===== 滑鼠 =====
-let mouse = { x: 0.5, y: 0.5 };
+  // 建立平面網格用於波浪
+  const geometry = new THREE.PlaneGeometry(5, 5, 64, 64);
+  material = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uColor: { value: new THREE.Vector4(...CONFIG.color) },
+      uAmplitude: { value: CONFIG.waveAmplitude },
+      uFrequency: { value: CONFIG.waveFrequency },
+      uSpeed: { value: CONFIG.waveSpeed }
+    },
+    vertexShader,
+    fragmentShader,
+    transparent: true,
+    wireframe: true // 貝殼放大風格通常帶有線條感
+  });
 
-window.addEventListener("pointermove", (e) => {
-  mouse.x = e.clientX / window.innerWidth;
-  mouse.y = 1 - e.clientY / window.innerHeight;
-});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 3; // 傾斜視角
+  scene.add(mesh);
 
-// ===== texture =====
-const texture = new THREE.TextureLoader().load(CONFIG.image);
+  window.addEventListener('resize', onWindowResize);
+  animate();
+  triggerLoadingSequence();
+}
 
-// ===== material =====
-const material = new THREE.ShaderMaterial({
-  uniforms: {
-    uTexture: { value: texture },
-    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-    uTime: { value: 0 },
+// RWD 核心：動態調整 Canvas 與 Camera
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
-    uStrength: { value: CONFIG.ripple.strength },
-    uFrequency: { value: CONFIG.ripple.frequency },
-    uSpeed: { value: CONFIG.ripple.speed },
-    uNoise: { value: CONFIG.noise.strength },
-    uGlow: { value: CONFIG.glow.intensity },
-  },
-  vertexShader,
-  fragmentShader,
-});
-
-const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-scene.add(mesh);
-
-// ===== animate =====
 function animate() {
   requestAnimationFrame(animate);
-
-  material.uniforms.uTime.value += 0.03;
-  material.uniforms.uMouse.value.set(mouse.x, mouse.y);
-
+  material.uniforms.uTime.value += 0.01;
   renderer.render(scene, camera);
 }
-animate();
 
-// ===== resize =====
-window.addEventListener("resize", () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+function triggerLoadingSequence() {
+  setTimeout(() => {
+    document.body.classList.add('is-loaded');
+    // 動畫銜接：縮小 Logo 並讓波浪充滿螢幕
+    mesh.scale.set(CONFIG.baseScale, CONFIG.baseScale, CONFIG.baseScale);
+  }, CONFIG.transitionDelay);
+}
+
+init();

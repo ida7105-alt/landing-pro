@@ -1,17 +1,9 @@
 export const CONFIG = {
-  image: "hero.jpg",
-
-  ripple: {
-    strength: 0.03,
-    frequency: 20,
-    speed: 4,
-  },
-
-  glow: {
-    intensity: 0.12,
-  },
-
-  noise: {
-    strength: 0.005,
-  }
+  color: [1.0, 1.0, 1.0, 0.5], // 白色 50% 透明度
+  waveSpeed: 0.5,
+  waveFrequency: 2.0,
+  waveAmplitude: 0.15, // 波浪高度
+  dotSize: 2.0,
+  baseScale: 0.4,      // Loading 完後的縮小比例
+  transitionDelay: 3000 // 模擬 Loading 時間
 };
