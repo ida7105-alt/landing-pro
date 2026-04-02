@@ -5,62 +5,73 @@ import { CONFIG } from './config.js';
 let scene, camera, renderer, mesh, material;
 
 function init() {
-  scene = new THREE.Scene();
-  
-  // RWD 相機設定
-  const aspect = window.innerWidth / window.innerHeight;
-  camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
-  camera.position.z = 2;
+    // 1. 初始化場景
+    scene = new THREE.Scene();
+    
+    // 2. 相機設定 (RWD 關鍵)
+    const aspect = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+    camera.position.z = 2.5; // 拉遠一點確保看得到波浪
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(window.devicePixelRatio); // 防止高解析度螢幕模糊
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('canvas-container').appendChild(renderer.domElement);
+    // 3. 渲染器
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // 效能優化
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    const container = document.getElementById('canvas-container');
+    if (container) {
+        container.appendChild(renderer.domElement);
+    } else {
+        console.error("找不到 #canvas-container 容器！");
+        return;
+    }
 
-  // 建立平面網格用於波浪
-  const geometry = new THREE.PlaneGeometry(5, 5, 64, 64);
-  material = new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-      uColor: { value: new THREE.Vector4(...CONFIG.color) },
-      uAmplitude: { value: CONFIG.waveAmplitude },
-      uFrequency: { value: CONFIG.waveFrequency },
-      uSpeed: { value: CONFIG.waveSpeed }
-    },
-    vertexShader,
-    fragmentShader,
-    transparent: true,
-    wireframe: true // 貝殼放大風格通常帶有線條感
-  });
+    // 4. 建立 3D 波浪物體 (Vertex Displacement)
+    const geometry = new THREE.PlaneGeometry(10, 10, 128, 128); // 提高分段讓波浪細膩
+    material = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            uColor: { value: new THREE.Vector4(...CONFIG.color) },
+            uAmplitude: { value: CONFIG.waveAmplitude },
+            uFrequency: { value: CONFIG.waveFrequency },
+            uSpeed: { value: CONFIG.waveSpeed }
+        },
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        wireframe: true // 貝殼放大風格的網格線
+    });
 
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.rotation.x = -Math.PI / 3; // 傾斜視角
-  scene.add(mesh);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = -Math.PI / 2.5; // 傾斜視角產生立體感
+    scene.add(mesh);
 
-  window.addEventListener('resize', onWindowResize);
-  animate();
-  triggerLoadingSequence();
+    // 5. 事件監聽
+    window.addEventListener('resize', onWindowResize);
+    
+    // 6. 開始循環
+    animate();
+    
+    // 模擬 Loading 完成後的縮小動態
+    setTimeout(() => {
+        document.body.classList.add('is-loaded');
+        console.log("Animation sequence triggered.");
+    }, CONFIG.transitionDelay);
 }
 
-// RWD 核心：動態調整 Canvas 與 Camera
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
-  requestAnimationFrame(animate);
-  material.uniforms.uTime.value += 0.01;
-  renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    if (material) {
+        material.uniforms.uTime.value += 0.01;
+    }
+    renderer.render(scene, camera);
 }
 
-function triggerLoadingSequence() {
-  setTimeout(() => {
-    document.body.classList.add('is-loaded');
-    // 動畫銜接：縮小 Logo 並讓波浪充滿螢幕
-    mesh.scale.set(CONFIG.baseScale, CONFIG.baseScale, CONFIG.baseScale);
-  }, CONFIG.transitionDelay);
-}
-
-init();
+// 確保 DOM 載入後執行
+document.addEventListener('DOMContentLoaded', init);
