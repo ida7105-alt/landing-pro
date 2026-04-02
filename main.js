@@ -1,34 +1,27 @@
 import * as THREE from 'https://unpkg.com/three@0.150.1/build/three.module.js';
-
 import { vertexShader, fragmentShader } from './shader.js';
 import { CONFIG } from './config.js';
 
 let scene, camera, renderer, mesh, material;
+const mouse = { x: 0, y: 0 };
+const targetMouse = { x: 0, y: 0 };
 
 function init() {
-    // 1. 初始化場景
+    // 1. 場景與相機
     scene = new THREE.Scene();
-    
-    // 2. 相機設定 (RWD 關鍵)
-    const aspect = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
-    camera.position.z = 2.5; // 拉遠一點確保看得到波浪
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 2.5;
 
-    // 3. 渲染器
+    // 2. 渲染器設定 (處理 RWD 與高解析度)
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // 效能優化
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     
     const container = document.getElementById('canvas-container');
-    if (container) {
-        container.appendChild(renderer.domElement);
-    } else {
-        console.error("找不到 #canvas-container 容器！");
-        return;
-    }
+    if (container) container.appendChild(renderer.domElement);
 
-    // 4. 建立 3D 波浪物體 (Vertex Displacement)
-    const geometry = new THREE.PlaneGeometry(10, 10, 128, 128); // 提高分段讓波浪細膩
+    // 3. 建立 3D 網格 (使用 ShaderMaterial)
+    const geometry = new THREE.PlaneGeometry(10, 10, 100, 100);
     material = new THREE.ShaderMaterial({
         uniforms: {
             uTime: { value: 0 },
@@ -40,24 +33,29 @@ function init() {
         vertexShader,
         fragmentShader,
         transparent: true,
-        wireframe: true // 貝殼放大風格的網格線
+        wireframe: true // 關鍵：呈現貝殼放大風格的網格線
     });
 
     mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = -Math.PI / 2.5; // 傾斜視角產生立體感
+    mesh.rotation.x = -Math.PI / 2.5; // 預設傾斜視角
     scene.add(mesh);
 
-    // 5. 事件監聽
+    // 4. 事件監聽
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener('mousemove', onMouseMove);
     
-    // 6. 開始循環
     animate();
-    
-    // 模擬 Loading 完成後的縮小動態
+
+    // 5. 執行進場序列
     setTimeout(() => {
         document.body.classList.add('is-loaded');
-        console.log("Animation sequence triggered.");
     }, CONFIG.transitionDelay);
+}
+
+function onMouseMove(event) {
+    // 座標歸一化 (-1 to 1)
+    targetMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    targetMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
 function onWindowResize() {
@@ -68,11 +66,27 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // 滑鼠慣性緩動 (Lerp)
+    mouse.x += (targetMouse.x - mouse.x) * CONFIG.lerpSpeed;
+    mouse.y += (targetMouse.y - mouse.y) * CONFIG.lerpSpeed;
+
+    if (mesh) {
+        // 根據滑鼠位置產生輕微傾斜互動
+        mesh.rotation.y = mouse.x * CONFIG.mouseSensitivity;
+        mesh.rotation.x = (-Math.PI / 2.5) + (mouse.y * CONFIG.mouseSensitivity);
+    }
+
     if (material) {
         material.uniforms.uTime.value += 0.01;
     }
+
     renderer.render(scene, camera);
 }
 
-// 確保 DOM 載入後執行
-document.addEventListener('DOMContentLoaded', init);
+// 確保 DOM 載入後啟動
+if (document.readyState === 'complete') {
+    init();
+} else {
+    document.addEventListener('DOMContentLoaded', init);
+}
