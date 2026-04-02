@@ -12,3 +12,7 @@
 canvas {
     display: block; /* 移除內建邊距 */
 }
+
+.logo-overlay {
+    pointer-events: none; /* 確保滑鼠可以穿透 Logo 傳給背景的 Canvas */
+}
