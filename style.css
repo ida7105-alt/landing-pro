@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a1033;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+/* 粒子背景 */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* 中央內容 */
+.content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 10;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  line-height: 1.4;
+}
+
+.subtitle {
+  margin-top: 20px;
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+
+/* CTA 按鈕 */
+button {
+  margin-top: 40px;
+  padding: 12px 28px;
+  border: 1px solid #ffd54f;
+  background: transparent;
+  color: #ffd54f;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #ffd54f;
+  color: #0a1033;
+  transform: translateY(-2px);
+}
