@@ -69,15 +69,17 @@ function animate() {
     requestAnimationFrame(animate);
 
     // 慣性平滑計算 (Lerp)
-    // 如果這裡沒動，代表 lerpSpeed 可能太小或 mouse 變數沒被更新
     mouse.x += (targetMouse.x - mouse.x) * CONFIG.lerpSpeed;
+    // 雖然不影響旋轉，但保留 mouse.y 計算可供未來 Shader 使用
     mouse.y += (targetMouse.y - mouse.y) * CONFIG.lerpSpeed;
 
     if (mesh) {
-        // 核心旋轉：基礎值 + 滑鼠偏移 * 靈敏度
-        // y 軸旋轉控制左右，x 軸旋轉控制上下
+        // --- 核心修改處 ---
+        // 1. 左右旋轉 (Y軸)：隨滑鼠 mouse.x 偏移
         mesh.rotation.y = mouse.x * CONFIG.mouseSensitivity;
-        mesh.rotation.x = (-Math.PI / 2.5) + (mouse.y * CONFIG.mouseSensitivity);
+        
+        // 2. 上下角度 (X軸)：固定在預設傾斜值，不隨滑鼠改變
+        mesh.rotation.x = -Math.PI / 2.5; 
     }
 
     if (material) {

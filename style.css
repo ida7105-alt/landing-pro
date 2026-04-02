@@ -1,12 +1,10 @@
-/* style.css */
 #canvas-container {
-    position: fixed; /* 改用 fixed 確保滿版 */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* 放在 Logo 後面 */
-    background: #000; /* 預設黑色背景 */
+    z-index: 1; /* 確保它在背景 */
 }
 
 canvas {
@@ -14,5 +12,14 @@ canvas {
 }
 
 .logo-overlay {
-    pointer-events: none; /* 確保滑鼠可以穿透 Logo 傳給背景的 Canvas */
-}
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* 讓滑鼠點擊與移動可以穿過 Logo 層 */
+    pointer-events: none; 
+    
+    z-index: 10;
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}}

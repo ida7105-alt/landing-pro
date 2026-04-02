@@ -3,9 +3,7 @@ export const CONFIG = {
     waveSpeed: 0.8,
     waveFrequency: 1.5,
     waveAmplitude: 0.3,
-    // 增加靈敏度到 0.3，讓效果非常明顯
-    mouseSensitivity: 0.3, 
-    // 慣性速度提高一點
+    mouseSensitivity: 0.5, // 提高靈敏度，左右擺動更明顯
     lerpSpeed: 0.08, 
     baseScale: 0.4,
     transitionDelay: 2000 
