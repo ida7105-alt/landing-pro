@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>landing-pro | Portfolio Hero</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="grain" aria-hidden="true"></canvas>
+
+    <div class="page">
+      <div class="topbar">
+        <div class="brand">
+          <span class="brand__dot"></span>
+          <span>landing-pro</span>
+        </div>
+
+        <nav class="nav">
+          <a href="#work">Work</a>
+          <a href="#process">Process</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+
+      <main class="hero">
+        <section class="hero__copy">
+          <div class="eyebrow">Interactive Hero / Portfolio Edition</div>
+
+          <h1>把第一屏做得像有呼吸感的品牌首頁。</h1>
+
+          <p class="lead">
+            這版把 loading bar、鼠標互動、柔和光暈與顆粒層疊在一起，
+            讓畫面看起來更像照片、也更像正式作品集。
+          </p>
+
+          <div class="actions">
+            <a class="btn btn--primary" href="#work">View case study</a>
+            <a class="btn btn--ghost" href="#contact">Contact</a>
+          </div>
+
+          <div class="stats" id="work">
+            <div class="stat">
+              <strong>01</strong>
+              <span>Loading reveal</span>
+            </div>
+            <div class="stat">
+              <strong>02</strong>
+              <span>Mouse glow</span>
+            </div>
+            <div class="stat">
+              <strong>03</strong>
+              <span>Photo-like grain</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="hero__visual" aria-label="Hero preview">
+          <div class="poster">
+            <div class="poster__bar">
+              <span></span>
+            </div>
+
+            <div class="poster__card">
+              <div class="poster__image">
+                <div class="poster__imageOverlay"></div>
+                <div class="poster__badge">New landing system</div>
+              </div>
+
+              <div class="poster__meta" id="process">
+                <div>
+                  <span class="meta__label">Motion</span>
+                  <strong>Fluid + subtle</strong>
+                </div>
+                <div>
+                  <span class="meta__label">Texture</span>
+                  <strong>Dynamic grain</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" id="contact">
+        <span>Design-first • Static-friendly • GitHub Pages ready</span>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
